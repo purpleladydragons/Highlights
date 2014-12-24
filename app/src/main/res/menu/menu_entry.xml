@@ -1,0 +1,8 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools" tools:context="com.highlights.EntryActivity">
+    <item android:id="@+id/action_saveEntry" android:title="@string/action_saveEntry"
+        android:orderInCategory="100" app:showAsAction="never" />
+    <item android:id="@+id/action_editEntry" android:title="@string/action_editEntry"
+        android:orderInCategory="100" app:showAsAction="never" />
+</menu>

@@ -25,6 +25,7 @@
         android:layout_height="wrap_content"
         android:text="New Text"
         android:id="@+id/entryItemText"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true" />
+        android:layout_above="@+id/entryItemDayOfMonth"
+        android:layout_toRightOf="@+id/entryItemMonthAndYear"
+        android:layout_toEndOf="@+id/entryItemMonthAndYear" />
 </RelativeLayout>

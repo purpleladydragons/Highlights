@@ -21,8 +21,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.support.v4.widget.DrawerLayout;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ExpandableListView;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.highlights.db.Contract;
@@ -55,7 +57,8 @@ public class MainActivity extends ActionBarActivity {
      */
     private CharSequence mTitle;
 
-    EntryExpandableListAdapter listAdapter;
+    EntryListAdapter listAdapter;
+    List<EntryItem> entries;
     List<YearMonth> listDataHeader;
     HashMap<YearMonth, List<EntryItem>> listDataChild;
 
@@ -69,10 +72,21 @@ public class MainActivity extends ActionBarActivity {
 
         mTitle = getTitle();
 
-        ExpandableListView expListView = (ExpandableListView) findViewById(R.id.entryList);
-        prepareListData();
-        listAdapter = new EntryExpandableListAdapter(this, listDataHeader, listDataChild);
-        expListView.setAdapter(listAdapter);
+        ListView listView = (ListView) findViewById(R.id.entryList);
+        listAdapter = new EntryListAdapter(fetchAllEntries());
+        listView.setAdapter(listAdapter);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                EntryItem entry = listAdapter.getItem(position);
+                if(entry == null) {
+                    System.out.println("fucking kill me");
+                }
+                Intent intent = new Intent(MainActivity.this, EntryActivity.class);
+                intent.putExtra("entryDate", new DateTime(entry.getUnixtime() * 1000).toString());
+                startActivity(intent);
+            }
+        });
 
         setEntryAlarm();
     }
@@ -80,31 +94,60 @@ public class MainActivity extends ActionBarActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        prepareListData();
-
+        listAdapter.swapItems(fetchAllEntries());
     }
 
-    // TODO lazy load the list structure instead of loading entire db
-    private void prepareListData() {
-        listDataHeader = new ArrayList<YearMonth>();
-        listDataChild = new HashMap<YearMonth, List<EntryItem>>();
+    private List<EntryItem> fetchAllEntries() {
+        ArrayList<EntryItem> entries = new ArrayList<EntryItem>();
+        DbHelper dbHelper = new DbHelper(this);
+        SQLiteDatabase rdb = dbHelper.getReadableDatabase();
+        rdb.beginTransaction();
 
-        int maxYear = getMaxYear();
-        int minYear = getMinYear();
+        String[] projection = {
+                EntryModel._ID,
+                EntryModel.COLUMN_NAME_DAY_OF_MONTH,
+                EntryModel.COLUMN_NAME_MONTH,
+                EntryModel.COLUMN_NAME_YEAR,
+                EntryModel.COLUMN_NAME_UNIX_TIME,
+                EntryModel.COLUMN_NAME_ENTRY_TEXT
+        };
 
-        // TODO so this is pretty slow/bad
-        // it goes through every single possible year and month combo
-        // and checks to see if it's actually a real thing
-        for(int year=maxYear;year>=minYear;year--) {
-            for(int month=1;month<=12;month++) {
-                YearMonth yearMonth = new YearMonth(year, month);
-                List<EntryItem> l = fetchEntriesFromMonth(yearMonth);
-                if(l.size() > 0) {
-                    listDataHeader.add(yearMonth);
-                    listDataChild.put(yearMonth, l);
-                }
-            }
+        String orderBy = EntryModel.COLUMN_NAME_UNIX_TIME + " DESC";
+
+        Cursor c = rdb.query(EntryModel.TABLE_NAME,
+                projection,
+                null,
+                null,
+                null,
+                null,
+                orderBy);
+
+        while(c.moveToNext()) {
+            EntryItem entry = new EntryItem();
+
+            int id = c.getInt(c.getColumnIndexOrThrow(EntryModel._ID));
+            int dayOfMonth = c.getInt(c.getColumnIndexOrThrow(EntryModel.COLUMN_NAME_DAY_OF_MONTH));
+            int eMonth = c.getInt(c.getColumnIndexOrThrow(EntryModel.COLUMN_NAME_MONTH));
+            int eYear = c.getInt(c.getColumnIndexOrThrow(EntryModel.COLUMN_NAME_YEAR));
+            String text = c.getString(c.getColumnIndexOrThrow(EntryModel.COLUMN_NAME_ENTRY_TEXT));
+            long unixtime = c.getLong(c.getColumnIndexOrThrow(EntryModel.COLUMN_NAME_UNIX_TIME));
+            entry.setId(id);
+            entry.setDayOfMonth(dayOfMonth);
+            entry.setMonth(eMonth);
+            entry.setYear(eYear);
+            entry.setText(text);
+            entry.setUnixtime(unixtime);
+
+            entries.add(entry);
         }
+
+        c.close();
+        rdb.setTransactionSuccessful();
+        rdb.endTransaction();
+
+        System.out.println("FUCK:"+entries.size());
+        return entries;
+
     }
 
     private int getMaxYear() {
@@ -261,6 +304,61 @@ public class MainActivity extends ActionBarActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private class EntryListAdapter extends ArrayAdapter<EntryItem> {
+
+        private List<EntryItem> items;
+
+        public EntryListAdapter(List<EntryItem> entries) {
+            super(MainActivity.this, -1, -1, entries);
+            items = entries;
+        }
+
+        @Override
+        public int getCount() {
+            return items.size();
+        }
+
+        @Override
+        public EntryItem getItem(int position) {
+            return items.get(position);
+        }
+
+        @Override
+        public long getItemId(int position) {
+            return position;
+        }
+
+        @Override
+        public View getView(final int position, View convertView, ViewGroup parent) {
+            final EntryItem entry = (EntryItem) getItem(position);
+            if(convertView == null) {
+                LayoutInflater layoutInflater =
+                        (LayoutInflater) MainActivity.this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                convertView = layoutInflater.inflate(R.layout.entry_list_item, null);
+            }
+
+            TextView entryItemDayOfMonth = (TextView) convertView
+                    .findViewById(R.id.entryItemDayOfMonth);
+            TextView entryItemMonthAndYear = (TextView) convertView
+                    .findViewById(R.id.entryItemMonthAndYear);
+            TextView entryItemText = (TextView) convertView
+                    .findViewById(R.id.entryItemText);
+
+            // TODO set text
+            entryItemDayOfMonth.setText(Integer.toString(entry.getDayOfMonth()));
+            entryItemMonthAndYear.setText(new YearMonth(entry.getYear(), entry.getMonth()).toString("MMMM yyyy"));
+            entryItemText.setText(entry.getText());
+            return convertView;
+        }
+
+        public void swapItems(List<EntryItem> items) {
+            this.items = items;
+            notifyDataSetChanged();
+        }
+
+
     }
 
 }

@@ -99,8 +99,9 @@ public class EntryExpandableListAdapter extends BaseExpandableListAdapter{
 
         TextView entryItemDayOfMonth = (TextView) convertView
                 .findViewById(R.id.entryItemDayOfMonth);
-        TextView entryItemMonthAndYear = (TextView) convertView
-                .findViewById(R.id.entryItemMonthAndYear);
+        TextView entryItemMonth = (TextView) convertView
+                .findViewById(R.id.entryItemMonth);
+
         TextView entryItemText = (TextView) convertView
                 .findViewById(R.id.entryItemText);
 

@@ -31,6 +31,8 @@ import com.highlights.db.Contract;
 import com.highlights.db.DbHelper;
 import com.highlights.model.EntryItem;
 import com.highlights.service.EntryNotificationAlarmReceiver;
+import com.joanzapata.android.iconify.IconDrawable;
+import com.joanzapata.android.iconify.Iconify;
 import com.roomorama.caldroid.CaldroidFragment;
 import com.roomorama.caldroid.CaldroidListener;
 
@@ -266,6 +268,14 @@ public class MainActivity extends ActionBarActivity {
 
         getMenuInflater().inflate(R.menu.main, menu);
         restoreActionBar();
+        menu.findItem(R.id.action_calendar).setIcon(
+                new IconDrawable(this, Iconify.IconValue.fa_calendar)
+                    .colorRes(R.color.white)
+                    .actionBarSize());
+        menu.findItem(R.id.action_addEntry).setIcon(
+                new IconDrawable(this, Iconify.IconValue.fa_pencil)
+                    .colorRes(R.color.white)
+                    .actionBarSize());
         return true;
 
     }
@@ -341,19 +351,23 @@ public class MainActivity extends ActionBarActivity {
 
             TextView entryItemDayOfMonth = (TextView) convertView
                     .findViewById(R.id.entryItemDayOfMonth);
-            TextView entryItemMonthAndYear = (TextView) convertView
-                    .findViewById(R.id.entryItemMonthAndYear);
+            TextView entryItemMonth = (TextView) convertView
+                    .findViewById(R.id.entryItemMonth);
+            TextView entryItemYear = (TextView) convertView
+                    .findViewById(R.id.entryItemYear);
             TextView entryItemText = (TextView) convertView
                     .findViewById(R.id.entryItemText);
 
             // TODO set text
             entryItemDayOfMonth.setText(Integer.toString(entry.getDayOfMonth()));
-            entryItemMonthAndYear.setText(new YearMonth(entry.getYear(), entry.getMonth()).toString("MMMM yyyy"));
+            entryItemMonth.setText(new YearMonth(entry.getYear(), entry.getMonth()).toString("MMM"));
+            entryItemYear.setText(Integer.toString(entry.getYear()));
             entryItemText.setText(entry.getText());
             return convertView;
         }
 
         public void swapItems(List<EntryItem> items) {
+
             this.items = items;
             notifyDataSetChanged();
         }

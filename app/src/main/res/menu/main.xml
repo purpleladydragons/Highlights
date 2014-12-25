@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools" tools:context=".MainActivity">
     <item android:id="@+id/action_calendar" android:title="@string/action_calendar"
         app:showAsAction="ifRoom" />
+
     <item android:id="@+id/action_addEntry" android:title="@string/action_addEntry"
         app:showAsAction="always" />
 </menu>

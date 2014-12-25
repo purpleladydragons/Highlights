@@ -5,27 +5,47 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="New Text"
-        android:id="@+id/entryItemMonthAndYear"
-        android:layout_alignParentTop="true"
+        android:text="Dec"
+        android:textSize="24sp"
+        android:paddingLeft="15dp"
+        android:id="@+id/entryItemMonth"
+        android:layout_below="@+id/entryItemDayOfMonth"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="New Text"
+        android:text="22"
+        android:textSize="30sp"
         android:id="@+id/entryItemDayOfMonth"
-        android:layout_below="@+id/entryItemMonthAndYear"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
+        android:paddingLeft="15dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignLeft="@+id/entryItemYear"
+        android:layout_alignStart="@+id/entryItemYear" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="New Text"
+        android:text="I finished the app"
+        android:textStyle="italic"
+        android:paddingLeft="15dp"
+        android:gravity="center|left"
         android:id="@+id/entryItemText"
-        android:layout_above="@+id/entryItemDayOfMonth"
-        android:layout_toRightOf="@+id/entryItemMonthAndYear"
-        android:layout_toEndOf="@+id/entryItemMonthAndYear" />
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_toRightOf="@+id/entryItemDayOfMonth"
+        android:layout_toEndOf="@+id/entryItemDayOfMonth"
+        android:layout_alignBottom="@+id/entryItemYear"
+        android:layout_alignParentTop="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="2014"
+        android:paddingLeft="15dp"
+        android:id="@+id/entryItemYear"
+        android:layout_below="@+id/entryItemMonth"
+        android:layout_alignRight="@+id/entryItemMonth"
+        android:layout_alignEnd="@+id/entryItemMonth" />
 </RelativeLayout>

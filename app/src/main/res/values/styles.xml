@@ -2,7 +2,11 @@
 
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
-        <!-- Customize your theme here. -->
+        <item name="android:actionButtonStyle">@style/PaddingActionButtonStyle</item>
+    </style>
+
+    <style name="PaddingActionButtonStyle" parent="Widget.AppCompat.ActionButton">
+        <item name="android:padding">15dp</item>
     </style>
 
 </resources>
